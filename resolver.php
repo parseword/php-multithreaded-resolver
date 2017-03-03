@@ -47,11 +47,11 @@ class ResolverThread extends Thread {
             //We got a hostname, resolve to an IP
             if ($result = @dns_get_record($this->host, DNS_A)) {
                 echo $this->host . ':' . $result[0]['ip'] . "\n";
-                //echo sprintf("%17.6f", microtime(true)) . ':: ' . "{$this->id}:{$this->host}:" . $in_addr . ' ::: ' . $result[0]['ip'] . "\n";
+                $this->debug("threadId {$this->id}:: {$this->host}:" . $in_addr . ':' . $result[0]['ip']);
             }
             else {
                 echo $this->host . ":SERVFAIL\n";
-                //echo sprintf("%17.6f", microtime(true)) . ':: ' . "{$this->id}:{$this->host}:" . $in_addr . " ::: SERVFAIL\n";
+                $this->debug("threadId {$this->id}:: {$this->host}:" . $in_addr . ":SERVFAIL");
             }
         }
         
@@ -60,17 +60,20 @@ class ResolverThread extends Thread {
             $in_addr = join('.', array_reverse(explode('.', $this->host))) . '.in-addr.arpa';
             if ($result = @dns_get_record($in_addr, DNS_PTR)) {
                 echo $this->host . ':' . $result[0]['target'] . "\n";
-                //echo sprintf("%17.6f", microtime(true)) . ':: ' . "{$this->id}:{$this->host}:" . $in_addr . ' ::: ' . $result[0]['target'] . "\n";
+                $this->debug("threadId {$this->id}:: {$this->host}:" . $in_addr . ':' . $result[0]['target']);
             }
             else {
                 echo $this->host . ":SERVFAIL\n";
-                //echo sprintf("%17.6f", microtime(true)) . ':: ' . "{$this->id}:{$this->host}:" . $in_addr . " ::: SERVFAIL\n";
+                $this->debug("threadId {$this->id}:: {$this->host}:" . $in_addr . ":SERVFAIL");
             }
         }
         usleep(100);
     }
     public function getId() {
         return $this->id;
+    }
+    private function debug($message) {
+        echo DEBUG ? sprintf("%17.6f", microtime(true)) . ':: ' . $message . "\n" : '';
     }
 }
 
