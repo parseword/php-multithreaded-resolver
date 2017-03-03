@@ -77,20 +77,17 @@ class ResolverThread extends Thread {
     }
 }
 
-//Load list of hosts to resolve
-//:TODO: refactor into fgets() and avoid loading the whole file into RAM
-$hosts = array_map('trim', file('hosts.txt'));
-$totalJobs = count($hosts);
-$jobsStarted = 0;
+//Open the list of hosts to resolve
+$fp = fopen('hosts.txt', 'r');
+
 $workers = array();
 $timeStart = microtime(true);
 
 //Load the workers queue with MAX_THREADS threads
-while (@$i++ < MAX_THREADS) {
+while (@$i++ < MAX_THREADS && !feof($fp)) {
     $threadId = bin2hex(openssl_random_pseudo_bytes(8));
-    $workers[$threadId] = new ResolverThread($threadId, array_pop($hosts));
+    $workers[$threadId] = new ResolverThread($threadId, trim(fgets($fp)));
     $workers[$threadId]->start();
-    $jobsStarted++;
 }
 
 //Manage the thread queue until there's no work left to do
@@ -117,20 +114,18 @@ while (1) {
         continue;
     
     //Refill the thread queue
-    $threadsToStart = (count($hosts) > $deadThreads) ? $deadThreads : count($hosts);
-    debug("Starting $threadsToStart threads");
-    for ($i=0; $i < $threadsToStart; $i++) {
+    debug("Starting $deadThreads threads");
+    for ($i=0; $i < $deadThreads && $host = fgets($fp); $i++) {
         $threadId = bin2hex(openssl_random_pseudo_bytes(8));
         debug('memory_get_usage ' . memory_get_usage());
         debug('workers[] ' . count($workers) . ' deadThreads ' . $deadThreads 
-            . ' threadsToStart ' . $threadsToStart . " Creating new thread $threadId");
-        $workers[$threadId] = new ResolverThread($threadId, array_pop($hosts));
+            . " Creating new thread $threadId");
+        $workers[$threadId] = new ResolverThread($threadId, trim($host));
         $workers[$threadId]->start();
-        $jobsStarted++;
     }
     
     //Bail when we're out of work to do
-    if ($jobsStarted >= $totalJobs && count($workers) == 0) {
+    if (feof($fp) && count($workers) == 0) {
         break;
     }
 }
