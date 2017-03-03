@@ -5,7 +5,11 @@
 error_reporting(E_ALL);
 define('DEBUG', true);
 define('MAX_THREADS', 16);
-$start = microtime(true);
+define('PTHREADS_VERSION', preg_replace('|[^0-9\.]|', '', phpversion('pthreads')));
+
+if (!PTHREADS_VERSION) {
+    die("This script requires PHP compiled with the pthreads extension.\n");
+}
 
 function debug($message) {
     echo DEBUG ? sprintf("%17.6f", microtime(true)) . ':: ' . $message . "\n" : '';
@@ -59,6 +63,7 @@ $hosts = array_map('trim', file('hosts.txt'));
 $totalJobs = count($hosts);
 $jobsStarted = 0;
 $workers = array();
+$timeStart = microtime(true);
 
 //Load the workers queue with MAX_THREADS threads
 while (@$i++ < MAX_THREADS) {
@@ -73,17 +78,19 @@ while (1) {
     $deadThreads = 0;
     foreach ($workers as $thread) {
 
-        
+        //If the thread is still working, skip it
         if ($thread->isRunning()) {
             continue;
         }
+        
+        //If the thread is completed, join and destroy it
         debug('Calling join() on ' . $thread->getId());
         if ($thread->join()) {
-            $thread->kill();
             unset($workers[$thread->getId()]);
             $deadThreads++;
         }
     }
+    
     if ($deadThreads == 0)
         continue;
 //    echo "workers[] has " . count($workers) . " threads\n";
@@ -103,4 +110,4 @@ while (1) {
     }
 }
 
-echo '#Script took ' . sprintf('%.02f', microtime(true) - $start) . " seconds to execute\n";
+echo '#Script took ' . sprintf('%.02f', microtime(true) - $timeStart) . " seconds to execute\n";
