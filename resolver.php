@@ -21,6 +21,7 @@ define('DEBUG', true);
 define('MAX_THREADS', 16);
 define('PTHREADS_VERSION', preg_replace('|[^0-9\.]|', '', phpversion('pthreads')));
 
+//We need pthreads in order to proceed
 if (!PTHREADS_VERSION) {
     die("This script requires PHP compiled with the pthreads extension.\n");
 }
@@ -29,6 +30,7 @@ function debug($message) {
     echo DEBUG ? sprintf("%17.6f", microtime(true)) . ':: ' . $message . "\n" : '';
 }
 
+//A class for the worker threads
 class ResolverThread extends Thread {
     
     private $id = null;
@@ -87,6 +89,7 @@ while (@$i++ < MAX_THREADS) {
     $jobsStarted++;
 }
 
+//Manage the thread queue until there's no work left to do
 while (1) {
     usleep(100000);
     $deadThreads = 0;
@@ -105,10 +108,11 @@ while (1) {
         }
     }
     
+    //If no threads were finished, go wait again
     if ($deadThreads == 0)
         continue;
-//    echo "workers[] has " . count($workers) . " threads\n";
-//    echo "Need to start $deadThreads threads\n";
+    
+    //Refill the thread queue
     $threadsToStart = (count($hosts) > $deadThreads) ? $deadThreads : count($hosts);
     debug("Starting $threadsToStart threads");
     for ($i=0; $i < $threadsToStart; $i++) {
@@ -119,6 +123,8 @@ while (1) {
         $workers[$threadId]->start();
         $jobsStarted++;
     }
+    
+    //Bail when we're out of work to do
     if ($jobsStarted >= $totalJobs && count($workers) == 0) {
         break;
     }
