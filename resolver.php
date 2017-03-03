@@ -57,8 +57,7 @@ class ResolverThread extends Thread {
         
         else {
             //Construct in-addr.arpa address and resolve to PTR
-            $quads = explode('.', $this->host);
-            $in_addr = $quads[3] . '.' . $quads[2] . '.' . $quads[1] . '.' . $quads[0] . '.in-addr.arpa';
+            $in_addr = join('.', array_reverse(explode('.', $this->host))) . '.in-addr.arpa';
             if ($result = @dns_get_record($in_addr, DNS_PTR)) {
                 echo $this->host . ':' . $result[0]['target'] . "\n";
                 //echo sprintf("%17.6f", microtime(true)) . ':: ' . "{$this->id}:{$this->host}:" . $in_addr . ' ::: ' . $result[0]['target'] . "\n";
@@ -75,6 +74,8 @@ class ResolverThread extends Thread {
     }
 }
 
+//Load list of hosts to resolve
+//:TODO: refactor into fgets() and avoid loading the whole file into RAM
 $hosts = array_map('trim', file('hosts.txt'));
 $totalJobs = count($hosts);
 $jobsStarted = 0;
@@ -118,7 +119,8 @@ while (1) {
     for ($i=0; $i < $threadsToStart; $i++) {
         $threadId = bin2hex(openssl_random_pseudo_bytes(8));
         debug('memory_get_usage ' . memory_get_usage());
-        debug('workers[] ' . count($workers) . ' deadThreads ' . $deadThreads . ' threadsToStart ' . $threadsToStart . " Creating new thread $threadId");
+        debug('workers[] ' . count($workers) . ' deadThreads ' . $deadThreads 
+            . ' threadsToStart ' . $threadsToStart . " Creating new thread $threadId");
         $workers[$threadId] = new ResolverThread($threadId, array_pop($hosts));
         $workers[$threadId]->start();
         $jobsStarted++;
