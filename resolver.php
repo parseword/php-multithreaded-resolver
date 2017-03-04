@@ -19,13 +19,13 @@
 error_reporting(E_ALL);
 define('DEBUG', true);
 define('MAX_THREADS', 16);
-define('PTHREADS_VERSION', preg_replace('|[^0-9\.]|', '', phpversion('pthreads')));
 
 //We need pthreads in order to proceed
-if (!PTHREADS_VERSION) {
+if (!phpversion('pthreads')) {
     die("This script requires PHP compiled with the pthreads extension.\n");
 }
 
+//A function to write debug messages to the console
 function debug($message) {
     echo DEBUG ? sprintf("%17.6f", microtime(true)) . ':: ' . $message . "\n" : '';
 }
@@ -85,7 +85,7 @@ $timeStart = microtime(true);
 
 //Load the workers queue with MAX_THREADS threads
 while (@$i++ < MAX_THREADS && !feof($fp)) {
-    $threadId = bin2hex(openssl_random_pseudo_bytes(8));
+    $threadId = substr(md5(microtime(true) . rand(0,999)), 0, 16);
     $workers[$threadId] = new ResolverThread($threadId, trim(fgets($fp)));
     $workers[$threadId]->start();
 }
@@ -116,7 +116,7 @@ while (1) {
     //Refill the thread queue
     debug("Starting $deadThreads threads");
     for ($i=0; $i < $deadThreads && $host = fgets($fp); $i++) {
-        $threadId = bin2hex(openssl_random_pseudo_bytes(8));
+        $threadId = substr(md5(microtime(true) . rand(0,999)), 0, 16);
         debug('memory_get_usage ' . memory_get_usage());
         debug('workers[] ' . count($workers) . ' deadThreads ' . $deadThreads 
             . " Creating new thread $threadId");
