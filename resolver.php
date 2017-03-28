@@ -47,11 +47,11 @@ class ResolverThread extends Thread {
             //We got a hostname, resolve to an IP
             if ($result = @dns_get_record($this->host, DNS_A)) {
                 echo $this->host . ':' . $result[0]['ip'] . "\n";
-                $this->debug("threadId {$this->id}:: {$this->host}:" . $in_addr . ':' . $result[0]['ip']);
+                $this->debug("threadId {$this->id}:: {$this->host}:" . $result[0]['ip']);
             }
             else {
                 echo $this->host . ":SERVFAIL\n";
-                $this->debug("threadId {$this->id}:: {$this->host}:" . $in_addr . ":SERVFAIL");
+                $this->debug("threadId {$this->id}:: {$this->host}:SERVFAIL");
             }
         }
         
