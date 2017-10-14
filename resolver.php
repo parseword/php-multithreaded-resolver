@@ -85,9 +85,11 @@ $timeStart = microtime(true);
 
 //Load the workers queue with MAX_THREADS threads
 while (@$i++ < MAX_THREADS && !feof($fp)) {
-    $threadId = substr(md5(microtime(true) . rand(0,999)), 0, 16);
-    $workers[$threadId] = new ResolverThread($threadId, trim(fgets($fp)));
-    $workers[$threadId]->start();
+    if (!empty($line = trim(fgets($fp)))) {
+        $threadId = substr(md5(microtime(true) . rand(0,999)), 0, 16);
+        $workers[$threadId] = new ResolverThread($threadId, $line);
+        $workers[$threadId]->start();
+    }
 }
 
 //Manage the thread queue until there's no work left to do
