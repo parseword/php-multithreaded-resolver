@@ -1,7 +1,7 @@
 <?php
 /*
  * Copyright 2017 Shaun Cummiskey, <shaun@shaunc.com> <http://shaunc.com>
- * <https://github.com/ampersign/php-multithreaded-resolver>
+ * <https://github.com/parseword/php-multithreaded-resolver>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
