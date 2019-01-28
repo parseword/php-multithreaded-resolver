@@ -37,8 +37,13 @@ OS package manager. This script was tested and is known to work on:
 ## A note on DNS servers
 
 This script will use whichever DNS server your operating system is configured 
-for. Many public DNS servers, including those operated by Google (8.8.8.8) and 
-Level3 (4.2.2.4), employ a throttling mechanism that refuses or ignores your 
+for. Many public DNS servers, including those operated by Google (8.8.8.8),  
+Level3 (4.2.2.4), etc. employ a throttling mechanism that refuses or ignores your 
 queries if you send too many too quickly. When resolving hosts in bulk, 
 you're better off using your ISP's DNS server or running a local recursive 
 DNS server.
+
+As an aside, if you operate your own DNS server(s), running this script 
+against a portion of the [Alexa Top 1M list](http://s3.amazonaws.com/alexa-static/top-1m.csv.zip) is 
+a good way to prime a freshly rebooted resolver.
+
