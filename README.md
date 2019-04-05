@@ -30,20 +30,21 @@ can compile it into PHP, get it from PECL, or perhaps install it through your
 OS package manager. This script was tested and is known to work on:
 
 * Linux, PHP 5.6.30 with pthreads 2.0.11
-* Linux, PHP 7.1.1 with pthreads 3.1.7dev
+* Linux, PHP 7.1.x with pthreads 3.1.7dev 
+* Linux, PHP 7.2.x with pthreads 3.2.1dev 
 * Windows, PHP 5.4.45 with pthreads 2.0.9
 * Windows, PHP 5.6.30 with pthreads 2.0.9
 
 ## A note on DNS servers
 
 This script will use whichever DNS server your operating system is configured 
-for. Many public DNS servers, including those operated by Google (8.8.8.8),  
+for. Many public DNS servers, including those operated by Google (8.8.8.8), 
 Level3 (4.2.2.4), etc. employ a throttling mechanism that refuses or ignores your 
 queries if you send too many too quickly. When resolving hosts in bulk, 
 you're better off using your ISP's DNS server or running a local recursive 
 DNS server.
 
-As an aside, if you operate your own DNS server(s), running this script 
+As an aside, if you do operate your own DNS server(s), running this script 
 against a portion of the [Alexa Top 1M list](http://s3.amazonaws.com/alexa-static/top-1m.csv.zip) is 
 a good way to prime a freshly rebooted resolver.
 
