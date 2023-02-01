@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright 2017 Shaun Cummiskey, <shaun@shaunc.com> <https://shaunc.com>
+ * Copyright 2017, 2023 Shaun Cummiskey, <shaun@shaunc.com> <https://shaunc.com>
  * <https://github.com/parseword/php-multithreaded-resolver/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,7 +43,7 @@ class ResolverThread extends Thread
         $this->host = $host;
     }
 
-    public function run() {
+    public function run(): void {
 
         if (preg_match('|[a-z]|i', $this->host)) {
             //We got a hostname, resolve to an IP
